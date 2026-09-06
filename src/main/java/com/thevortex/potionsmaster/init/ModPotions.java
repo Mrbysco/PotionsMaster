@@ -2,9 +2,7 @@ package com.thevortex.potionsmaster.init;
 
 import com.thevortex.potionsmaster.reference.Reference;
 
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.item.alchemy.Potion;
+import net.minecraft.resources.Identifier;
 
 
 public class ModPotions {
@@ -66,8 +64,8 @@ public class ModPotions {
     public static final Potion UNOBTAINIUM_SIGHT = new Potion("unobtainium_sight", UNOBTAINIUMSIGHT);
 */
 
-    private static ResourceLocation location(String name) {
-        return ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, name);
+    private static Identifier location(String name) {
+        return Identifier.fromNamespaceAndPath(Reference.MOD_ID, name);
     }
 
 }

@@ -1,7 +1,7 @@
 package com.thevortex.potionsmaster.render.util;
 
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
 
 import java.util.ArrayList;
@@ -16,6 +16,7 @@ public class BlockStore {
 
     private HashMap<UUID, BlockData> store = new HashMap<>();
     private HashMap<String, UUID> storeReference = new HashMap<>();
+    private HashMap<String, BlockData> storeByEntryName = new HashMap<>();
 
     public static ArrayList<BlockData> getFromSimpleBlockList(List<SimpleBlockData> simpleList) {
         ArrayList<BlockData> blockData = new ArrayList<>();
@@ -24,16 +25,16 @@ public class BlockStore {
             if (e == null)
                 continue;
 
-            ResourceLocation location = null;
+            Identifier location = null;
             try {
-                location = ResourceLocation.tryParse(e.getoreTag());
+                location = Identifier.tryParse(e.getoreTag());
             } catch (Exception ignored) {
             }
             ;
             if (location == null)
                 continue;
 
-            Block block = BuiltInRegistries.BLOCK.get(location);
+            Block block = BuiltInRegistries.BLOCK.getValue(location);
             if (block == null)
                 continue;
 
@@ -60,6 +61,7 @@ public class BlockStore {
         this.store.put(uniqueId, data);
 
         this.storeReference.put(data.getoreTag(), uniqueId);
+        this.storeByEntryName.put(data.getEntryName(), data);
     }
 
     public HashMap<UUID, BlockData> getStore() {
@@ -69,6 +71,7 @@ public class BlockStore {
     public void setStore(ArrayList<BlockData> store) {
         this.store.clear();
         this.storeReference.clear();
+        this.storeByEntryName.clear();
 
         store.forEach(this::put);
 
@@ -84,6 +87,10 @@ public class BlockStore {
             return null;
 
         return new BlockDataWithUUID(blockData, uniqueId);
+    }
+
+    public BlockData getByEntryName(String entryName) {
+        return storeByEntryName.get(entryName);
     }
 
     public void toggleDrawing(BlockData data) {

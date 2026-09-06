@@ -1,15 +1,6 @@
 package com.thevortex.potionsmaster.render.util.xray;
 
 
-
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
-import com.thevortex.potionsmaster.reference.Ores;
 import com.thevortex.potionsmaster.PotionsMaster;
 import com.thevortex.potionsmaster.render.util.BlockData;
 import com.thevortex.potionsmaster.render.util.BlockInfo;
@@ -19,12 +10,16 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.tags.TagKey;
-import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.LevelChunkSection;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class RenderEnqueue implements Runnable {
 	private final WorldRegion box;
@@ -122,7 +117,7 @@ public class RenderEnqueue implements Runnable {
 
 				// Loop on the extends around the player's layer (6 down, 2 up)
 				for (int curExtend = box.minChunkY; curExtend <= box.maxChunkY; curExtend++) {
-					LevelChunkSection ebs = extendsList[curExtend + (Math.abs(chunk.getMinBuildHeight()) >> 4) ];
+					LevelChunkSection ebs = extendsList[curExtend + (Math.abs(chunk.getMinY()) >> 4) ];
 					if (ebs == null) // happens quite often!
 						continue;
 
@@ -141,7 +136,7 @@ public class RenderEnqueue implements Runnable {
                                 //if( Controller.blackList.contains(currentState.getBlock()) )
                                 //	continue;
 
-                                List<TagKey<?>> oreTags = currentState.getTags().filter(tag -> tag.toString().contains("ores/")).collect(Collectors.toList());
+                                List<TagKey<?>> oreTags = currentState.tags().filter(tag -> tag.toString().contains("ores/")).collect(Collectors.toList());
                                 if (oreTags.isEmpty())
                                     continue;
 

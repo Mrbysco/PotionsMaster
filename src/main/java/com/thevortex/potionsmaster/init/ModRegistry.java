@@ -1,13 +1,5 @@
 package com.thevortex.potionsmaster.init;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
-import java.util.function.Supplier;
-
 import com.thevortex.potionsmaster.PotionsMaster;
 import com.thevortex.potionsmaster.blocks.Mortar;
 import com.thevortex.potionsmaster.items.Bezoar;
@@ -17,11 +9,8 @@ import com.thevortex.potionsmaster.items.potions.effect.oresight.OreSightEffect;
 import com.thevortex.potionsmaster.items.powders.base.BasePowder;
 import com.thevortex.potionsmaster.items.powders.base.CalcinatedPowder;
 import com.thevortex.potionsmaster.items.powders.calcinated.ActivatedCharcoal;
-import com.thevortex.potionsmaster.reference.Ores;
 import com.thevortex.potionsmaster.reference.Reference;
 import com.thevortex.potionsmaster.render.util.BlockData;
-
-import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.effect.MobEffect;
@@ -31,11 +20,16 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.Potion;
-import net.minecraft.world.item.alchemy.PotionContents;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class ModRegistry {
     public static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(Reference.MOD_ID);
@@ -47,7 +41,7 @@ public class ModRegistry {
 
 
     // Block(s?)
-    public static final DeferredBlock<Mortar> MORTAR = BLOCKS.register("tile_mortar", () -> new Mortar());
+    public static final DeferredBlock<Mortar> MORTAR = BLOCKS.registerBlock("tile_mortar", Mortar::new);
     // Potions
    
    
@@ -102,7 +96,7 @@ public class ModRegistry {
     public static final DeferredItem<CalcinatedPowder> CALCINATEDALLTHEMODIUM_POWDER = ITEMS.register("calcinatedallthemodium_powder", () -> new CalcinatedPowder(new Item.Properties()));;
     public static final DeferredItem<CalcinatedPowder> CALCINATEDVIBRANIUM_POWDER = ITEMS.register("calcinatedvibranium_powder", () -> new CalcinatedPowder(new Item.Properties()));;
     public static final DeferredItem<CalcinatedPowder> CALCINATEDUNOBTAINIUM_POWDER = ITEMS.register("calcinatedunobtainium_powder", () -> new CalcinatedPowder(new Item.Properties()));; */
-    public static final DeferredItem<Item> ENDER_POWDER = ITEMS.register("ender_powder", () ->  new Item(new Item.Properties()));
+    public static final DeferredItem<Item> ENDER_POWDER = ITEMS.registerSimpleItem("ender_powder");
 
     public static HashMap<String, DeferredHolder<MobEffect,MobEffect>> EffectsListParsed = new HashMap<>();
     public static HashMap<String, DeferredHolder<Potion,Potion>> PotionsListParsed = new HashMap<>();
@@ -111,22 +105,22 @@ public class ModRegistry {
     public static final List<DeferredHolder<MobEffect,MobEffect>> EffectList = registerEffects();
     public static final List<DeferredHolder<Potion,Potion>> PotionList = registerPotions();
 
-    public static final DeferredItem<Bezoar> BEZOAR = ITEMS.register("bezoar",() -> new Bezoar(new Item.Properties().food(ModFoods.BEZOAR)));
-    public static final DeferredItem<GallBladder> GALLBLADDER = ITEMS.register("gallbladder",() -> new GallBladder(new Item.Properties().food(ModFoods.GALLBLADDER)));
-    public static final DeferredItem<ActivatedCharcoal> ACTIVATEDCHARCOAL = ITEMS.register("activated_charcoal", () -> new ActivatedCharcoal(new Item.Properties().food(ModFoods.ACTIVATEDCHARCOAL)));
-    public static final DeferredItem<Pestle> PESTLE = ITEMS.register("pestle",() -> new Pestle(new Item.Properties()));
+    public static final DeferredItem<Bezoar> BEZOAR = ITEMS.registerItem("bezoar",(properties) -> new Bezoar(properties.food(ModFoods.BEZOAR)));
+    public static final DeferredItem<GallBladder> GALLBLADDER = ITEMS.registerItem("gallbladder",(properties) -> new GallBladder(properties.food(ModFoods.GALLBLADDER)));
+    public static final DeferredItem<ActivatedCharcoal> ACTIVATEDCHARCOAL = ITEMS.registerItem("activated_charcoal", (properties) -> new ActivatedCharcoal(properties.food(ModFoods.ACTIVATEDCHARCOAL)));
+    public static final DeferredItem<Pestle> PESTLE = ITEMS.registerItem("pestle", Pestle::new);
 
-    public static final DeferredItem<com.thevortex.potionsmaster.items.Mortar> ITEM_MORTAR = ITEMS.register("tile_mortar",() -> new com.thevortex.potionsmaster.items.Mortar(MORTAR.get(), new Item.Properties()));
+    public static final DeferredItem<com.thevortex.potionsmaster.items.Mortar> ITEM_MORTAR = ITEMS.registerItem("tile_mortar",(properties) -> new com.thevortex.potionsmaster.items.Mortar(MORTAR.get(), properties.useItemDescriptionPrefix()));
 
 
 
     
 
-    public static DeferredHolder<Item,Item> createBasePowder(String name, Supplier<BasePowder> itemSupplier) {
-        return ITEMS.register(name, itemSupplier);
+    public static DeferredHolder<Item,Item> createBasePowder(String name, Function<Item.Properties, BasePowder> function) {
+        return ITEMS.registerItem(name, function);
     }
-    public static DeferredHolder<Item,Item> createCalcinatedPowder(String name, Supplier<CalcinatedPowder> itemSupplier) {
-        return ITEMS.register(name, itemSupplier);
+    public static DeferredHolder<Item,Item> createCalcinatedPowder(String name, Function<Item.Properties, CalcinatedPowder> function) {
+        return ITEMS.registerItem(name, function);
     }
     public static DeferredHolder<MobEffect, MobEffect> createMobEffect(String name, Supplier<OreSightEffect> effectSupplier) {
         return MOBEFFECTS.register(name, effectSupplier);
@@ -138,7 +132,7 @@ public class ModRegistry {
     public static List<DeferredHolder<Item,Item>> registerBaseItems() {
         List<DeferredHolder<Item,Item>> list = new ArrayList<>();
         for(BlockData blockData : PotionsMaster.blockStore.getStore().values()) {
-            list.add(createBasePowder(blockData.getEntryName() + "_oresight_powder", () -> new BasePowder(blockData.getColor(),new Item.Properties())));
+            list.add(createBasePowder(blockData.getEntryName() + "_oresight_powder", (properties) -> new BasePowder(blockData.getColor(),properties)));
             
         }
         return list;
@@ -146,7 +140,7 @@ public class ModRegistry {
     public static List<DeferredHolder<Item,Item>> registerCalcinatedItems() {
         List<DeferredHolder<Item,Item>> list = new ArrayList<>();
         for(BlockData blockData : PotionsMaster.blockStore.getStore().values()) {
-            list.add(createCalcinatedPowder("calcinated_" + blockData.getEntryName() + "_oresight_powder", () -> new CalcinatedPowder(blockData.getColor(), new Item.Properties())));
+            list.add(createCalcinatedPowder("calcinated_" + blockData.getEntryName() + "_oresight_powder", (properties) -> new CalcinatedPowder(blockData.getColor(), properties)));
             
         }
         return list;

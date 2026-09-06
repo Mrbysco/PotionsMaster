@@ -1,6 +1,6 @@
 package com.thevortex.potionsmaster.reference;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.Block;
@@ -34,10 +34,10 @@ public class Ores {
     public static final TagKey<Block> UNOBTAINIUM = makeWrapperTag("ores/unobtainium");
 
     private static TagKey<Block> makeWrapperTag(String tagname) {
-        return BlockTags.create(ResourceLocation.fromNamespaceAndPath("c", tagname));
+        return BlockTags.create(Identifier.fromNamespaceAndPath("c", tagname));
 
     }
     private static TagKey<Block> vanillaWrapper(String tag){
-        return BlockTags.create(ResourceLocation.withDefaultNamespace(tag));
+        return BlockTags.create(Identifier.withDefaultNamespace(tag));
     }
 }

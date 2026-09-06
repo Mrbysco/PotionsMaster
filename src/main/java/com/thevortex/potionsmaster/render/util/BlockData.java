@@ -1,7 +1,5 @@
 package com.thevortex.potionsmaster.render.util;
 
-import com.thevortex.potionsmaster.render.util.OutlineColor;
-
 
 public class BlockData {
 

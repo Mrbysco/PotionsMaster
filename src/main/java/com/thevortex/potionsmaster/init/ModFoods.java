@@ -13,8 +13,8 @@ public class ModFoods {
 
 
     static {
-        BEZOAR = (new FoodProperties.Builder()).nutrition(1).saturationModifier(0.5F).fast().alwaysEdible().build();
-        ACTIVATEDCHARCOAL = (new FoodProperties.Builder()).nutrition(1).saturationModifier(0.5F).fast().alwaysEdible().build();
-        GALLBLADDER = (new FoodProperties.Builder()).nutrition(1).saturationModifier(0.5F).fast().alwaysEdible().build();
+        BEZOAR = (new FoodProperties.Builder()).nutrition(1).saturationModifier(0.5F).alwaysEdible().build(); //TODO: Use faster Consumable
+        ACTIVATEDCHARCOAL = (new FoodProperties.Builder()).nutrition(1).saturationModifier(0.5F).alwaysEdible().build();
+        GALLBLADDER = (new FoodProperties.Builder()).nutrition(1).saturationModifier(0.5F).alwaysEdible().build();
     }
 }

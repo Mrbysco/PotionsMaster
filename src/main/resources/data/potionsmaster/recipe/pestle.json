@@ -6,12 +6,8 @@
     " o "
   ],
   "key": {
-    "W": {
-      "tag": "c:gems/quartz"
-    },
-    "o": {
-      "tag": "c:gems/diamond"
-    }
+    "W": "#c:gems/quartz",
+    "o": "#c:gems/diamond"
   },
   "result": {
     "id": "potionsmaster:pestle"

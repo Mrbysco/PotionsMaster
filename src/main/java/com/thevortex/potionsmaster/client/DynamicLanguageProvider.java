@@ -5,8 +5,6 @@ import com.thevortex.potionsmaster.reference.Reference;
 import com.thevortex.potionsmaster.render.util.BlockData;
 import net.minecraft.locale.Language;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
-import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.util.profiling.ProfilerFiller;
 
 import java.lang.reflect.Field;
 import java.util.Map;
@@ -21,12 +19,10 @@ public class DynamicLanguageProvider implements PreparableReloadListener {
     private static boolean injected = false;
 
     @Override
-    public CompletableFuture<Void> reload(PreparationBarrier preparationBarrier, ResourceManager resourceManager,
-                                          ProfilerFiller preparationsProfiler, ProfilerFiller reloadProfiler,
-                                          Executor backgroundExecutor, Executor gameExecutor) {
+    public CompletableFuture<Void> reload(SharedState currentReload, Executor taskExecutor, PreparationBarrier preparationBarrier, Executor reloadExecutor) {
         return preparationBarrier.wait(null).thenRunAsync(() -> {
             injectLanguageEntries();
-        }, gameExecutor);
+        }, reloadExecutor);
     }
 
     private void injectLanguageEntries() {

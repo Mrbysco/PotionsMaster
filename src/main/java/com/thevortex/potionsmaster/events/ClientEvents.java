@@ -3,66 +3,61 @@ package com.thevortex.potionsmaster.events;
 import com.thevortex.potionsmaster.PotionsMaster;
 import com.thevortex.potionsmaster.reference.Reference;
 import com.thevortex.potionsmaster.render.util.BlockData;
-
-import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.client.resources.model.ModelResourceLocation;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import com.thevortex.potionsmaster.tint.OresightPowderTintSource;
+import net.minecraft.client.renderer.item.ItemModel;
+import net.minecraft.client.resources.model.geometry.QuadCollection;
+import net.minecraft.resources.Identifier;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ModelEvent;
 import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
+import net.neoforged.neoforge.client.model.standalone.SimpleUnbakedStandaloneModel;
+import net.neoforged.neoforge.client.model.standalone.StandaloneModelKey;
 
 import java.util.Map;
 
-@EventBusSubscriber(modid = Reference.MOD_ID, value = Dist.CLIENT, bus = EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid = Reference.MOD_ID, value = Dist.CLIENT)
 public class ClientEvents {
 
 
+    private static final StandaloneModelKey<QuadCollection> BASE_POWDER_KEY = makeKey("item/base_powder");
+    private static final StandaloneModelKey<QuadCollection> CALCINATED_BASE_KEY = makeKey("calcinated_base");
+
     @SubscribeEvent
-    public static void onRegisterAdditional(ModelEvent.RegisterAdditional event) {
+    public static void onRegisterAdditional(ModelEvent.RegisterStandalone event) {
         // Register the base template models so they get loaded
         PotionsMaster.LOGGER.info("=== Registering Additional Models ===");
-        event.register(ModelResourceLocation.standalone(
-            ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, "item/base_powder")));
+
+        registerModel(event, BASE_POWDER_KEY, "item/base_powder");
         PotionsMaster.LOGGER.info("Registered base_powder model for loading");
 
-        event.register(ModelResourceLocation.standalone(
-            ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, "item/calcinated_base")));
+        registerModel(event, CALCINATED_BASE_KEY, "item/calcinated_base");
         PotionsMaster.LOGGER.info("Registered calcinated_base model for loading");
         PotionsMaster.LOGGER.info("=== Additional Models Registration Complete ===");
     }
 
+    private static void registerModel(ModelEvent.RegisterStandalone event,
+                                      StandaloneModelKey<QuadCollection> key, String path) {
+        event.register(key, SimpleUnbakedStandaloneModel.quadCollection(
+                Identifier.fromNamespaceAndPath(Reference.MOD_ID, path)));
+    }
+
+    private static StandaloneModelKey<QuadCollection> makeKey(String name) {
+        return new StandaloneModelKey<>(() -> Reference.MOD_ID + ":" + name);
+    }
+
     @SuppressWarnings("deprecation")
     @SubscribeEvent
-    public static void on(RegisterColorHandlersEvent.Item event) {
+    public static void on(RegisterColorHandlersEvent.ItemTintSources event) {
         PotionsMaster.LOGGER.info("=== Starting Color Handler Registration ===");
-        PotionsMaster.LOGGER.info("Total BlockData entries: " + PotionsMaster.blockStore.getStore().size());
-
-            for (BlockData data : PotionsMaster.blockStore.getStore().values()) {
-                int color = data.getColor();
-                event.getItemColors().register((stack, tintIndex) -> {
-                    // Apply color tint to layer 0 (the texture layer)
-                    return tintIndex == 0 ? color : -1;
-                }, BuiltInRegistries.ITEM.get(ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID , data.getEntryName() + "_oresight_powder")));
-                PotionsMaster.LOGGER.info("Registered color handler for " + data.getEntryName() + "_oresight_powder with color: " + color + " (hex: " + String.format("0x%08X", color) + ")");
-            }
-     
-            for (BlockData data : PotionsMaster.blockStore.getStore().values()) {
-                int color = data.getColor();
-                event.getItemColors().register((stack, tintIndex) -> {
-                    // Apply color tint to layer 0 (the texture layer)
-                    return tintIndex == 0 ? color : -1;
-                }, BuiltInRegistries.ITEM.get(ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID , "calcinated_" + data.getEntryName() + "_oresight_powder")));
-                PotionsMaster.LOGGER.info("Registered color handler for calcinated_" + data.getEntryName() + "_oresight_powder with color: " + color + " (hex: " + String.format("0x%08X", color) + ")");
-            }
-
+        event.register(PotionsMaster.getId("oresight_powder"), OresightPowderTintSource.CODEC);
+        PotionsMaster.LOGGER.info("Registered oresight_powder item tint source");
         PotionsMaster.LOGGER.info("=== Color Handler Registration Complete ===");
     }
 
     @SubscribeEvent
-    public static void onRegisterSprites(net.neoforged.neoforge.client.event.RegisterSpriteSourceTypesEvent event) {
+    public static void onRegisterSprites(net.neoforged.neoforge.client.event.RegisterSpriteSourcesEvent event) {
         PotionsMaster.LOGGER.info("=== Registering Sprite Source Types ===");
         // Register our custom sprite source type for dynamic effect icons
         com.thevortex.potionsmaster.client.DynamicEffectSpriteSource.registerSpriteSourceType(event);
@@ -70,16 +65,16 @@ public class ClientEvents {
     }
 
     @SubscribeEvent
-    public static void onRegisterClientReloadListeners(net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent event) {
+    public static void onRegisterClientReloadListeners(net.neoforged.neoforge.client.event.AddClientReloadListenersEvent event) {
         PotionsMaster.LOGGER.info("=== Registering Language Reload Listener ===");
-        event.registerReloadListener(new com.thevortex.potionsmaster.client.DynamicLanguageProvider());
+        event.addListener(Identifier.fromNamespaceAndPath(Reference.MOD_ID, "dynamic_language"), new com.thevortex.potionsmaster.client.DynamicLanguageProvider());
         PotionsMaster.LOGGER.info("=== Language Reload Listener Registered ===");
     }
 
     @SubscribeEvent
     public static void onTextureAtlasStitch(net.neoforged.neoforge.client.event.TextureAtlasStitchedEvent event) {
         // After mob_effect atlas is stitched, verify our sprites were added
-        if (event.getAtlas().location().equals(ResourceLocation.withDefaultNamespace("textures/atlas/mob_effects.png"))) {
+        if (event.getAtlas().location().equals(Identifier.withDefaultNamespace("textures/atlas/mob_effects.png"))) {
             PotionsMaster.LOGGER.info("Mob effects atlas stitched - dynamic effect icons should be available");
         }
     }
@@ -87,53 +82,47 @@ public class ClientEvents {
 
         @SubscribeEvent
         public static void onModifyBakingResult(ModelEvent.ModifyBakingResult event) {
-            Map<ModelResourceLocation, BakedModel> modelRegistry = event.getModels();
+            Map<Identifier, ItemModel> itemModels = event.getBakingResult().itemStackModels();
 
             PotionsMaster.LOGGER.info("=== Starting Model Registration ===");
             PotionsMaster.LOGGER.info("Total BlockData entries: " + PotionsMaster.blockStore.getStore().size());
 
             // Get the base models to clone
-            ModelResourceLocation basePowderLoc = ModelResourceLocation.standalone(
-                ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, "item/base_powder"));
-            ModelResourceLocation calcinatedBaseLoc = ModelResourceLocation.standalone(
-                ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, "item/calcinated_base"));
+            Identifier basePowderLoc = PotionsMaster.getId("base_powder");
+            Identifier calcinatedBaseLoc = PotionsMaster.getId("calcinated_base");
 
             PotionsMaster.LOGGER.info("Looking for base_powder model at: " + basePowderLoc);
             PotionsMaster.LOGGER.info("Looking for calcinated_base model at: " + calcinatedBaseLoc);
 
-            BakedModel basePowderModel = modelRegistry.get(basePowderLoc);
-            BakedModel calcinatedBaseModel = modelRegistry.get(calcinatedBaseLoc);
+            ItemModel basePowderModel = itemModels.get(basePowderLoc);
+            ItemModel calcinatedBaseModel = itemModels.get(calcinatedBaseLoc);
 
             if (basePowderModel == null) {
                 PotionsMaster.LOGGER.error("Base powder model not found! Available models:");
-                modelRegistry.keySet().stream()
-                    .filter(loc -> loc.id().getNamespace().equals(Reference.MOD_ID))
-                    .limit(20)
-                    .forEach(loc -> PotionsMaster.LOGGER.error("  - " + loc));
+                itemModels.keySet().stream()
+                        .filter(loc -> loc.getNamespace().equals(Reference.MOD_ID))
+                        .limit(20)
+                        .forEach(loc -> PotionsMaster.LOGGER.error("  - " + loc));
                 return;
             }
             if (calcinatedBaseModel == null) {
                 PotionsMaster.LOGGER.error("Calcinated base model not found! Available models:");
-                modelRegistry.keySet().stream()
-                    .filter(loc -> loc.id().getNamespace().equals(Reference.MOD_ID))
-                    .limit(20)
-                    .forEach(loc -> PotionsMaster.LOGGER.error("  - " + loc));
+                itemModels.keySet().stream()
+                        .filter(loc -> loc.getNamespace().equals(Reference.MOD_ID))
+                        .limit(20)
+                        .forEach(loc -> PotionsMaster.LOGGER.error("  - " + loc));
                 return;
             }
 
             PotionsMaster.LOGGER.info("Successfully found both base models!");
 
             for(BlockData data : PotionsMaster.blockStore.getStore().values()) {
-                // Register regular powder model using base_powder as template
-                ModelResourceLocation regularPowderLocation = ModelResourceLocation.inventory(
-                    ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, data.getEntryName() + "_oresight_powder"));
-                modelRegistry.put(regularPowderLocation, basePowderModel);
+                // Register regular powder model using base_powder as template;
+                itemModels.put(Identifier.fromNamespaceAndPath(Reference.MOD_ID, data.getEntryName() + "_oresight_powder"), basePowderModel);
                 PotionsMaster.LOGGER.info("Registered model for " + data.getEntryName() + "_oresight_powder");
 
                 // Register calcinated powder model using calcinated_base as template
-                ModelResourceLocation calcinatedPowderLocation = ModelResourceLocation.inventory(
-                    ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, "calcinated_" + data.getEntryName() + "_oresight_powder"));
-                modelRegistry.put(calcinatedPowderLocation, calcinatedBaseModel);
+                itemModels.put(Identifier.fromNamespaceAndPath(Reference.MOD_ID, "calcinated_" + data.getEntryName() + "_oresight_powder"), calcinatedBaseModel);
                 PotionsMaster.LOGGER.info("Registered model for calcinated_" + data.getEntryName() + "_oresight_powder");
             }
 

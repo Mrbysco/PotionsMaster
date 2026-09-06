@@ -16,7 +16,7 @@ public class PacketHandler {
     public static void register(final RegisterPayloadHandlersEvent event) {
         final PayloadRegistrar registrar = event.registrar(PotionsMaster.MOD_ID);
         registrar.playToClient(PotionPacket.TYPE, PotionPacket.CODEC, PotionPacket.Handler::handle);
-
+        registrar.playToClient(OreSightEnablePacket.TYPE, OreSightEnablePacket.CODEC, OreSightEnablePacket.Handler::handle);
     }
 
     /**

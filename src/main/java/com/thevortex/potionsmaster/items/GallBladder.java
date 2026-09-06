@@ -19,8 +19,8 @@ public class GallBladder extends Item {
     public ItemStack finishUsingItem(ItemStack stack, Level worldIn, LivingEntity entityLiving) {
 
         if ((entityLiving instanceof Player player) && (stack.getItem() == ModRegistry.GALLBLADDER.get())) {
-	        if (player.hasEffect(MobEffects.DIG_SLOWDOWN)) {
-                player.removeEffect(MobEffects.DIG_SLOWDOWN);
+	        if (player.hasEffect(MobEffects.MINING_FATIGUE)) {
+                player.removeEffect(MobEffects.MINING_FATIGUE);
             }
         }
         return super.finishUsingItem(stack, worldIn, entityLiving);

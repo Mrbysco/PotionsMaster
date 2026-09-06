@@ -4,14 +4,11 @@ import com.thevortex.potionsmaster.PotionsMaster;
 import com.thevortex.potionsmaster.render.util.BlockData;
 import com.thevortex.potionsmaster.render.util.BlockStore;
 import com.thevortex.potionsmaster.render.util.xray.Controller;
-
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public record PotionPacket(String potionName) implements CustomPacketPayload {
@@ -40,7 +37,6 @@ public record PotionPacket(String potionName) implements CustomPacketPayload {
                     });
         }
 
-        @OnlyIn(Dist.CLIENT)
         private static void toggle(String potion) {
             BlockStore store = PotionsMaster.blockStore;
             store.getStoreByReference(potion).getBlockData().setDrawing(false);

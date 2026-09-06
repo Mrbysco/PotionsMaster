@@ -1,8 +1,5 @@
 package com.thevortex.potionsmaster;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import com.thevortex.potionsmaster.events.PotionExpiry;
 import com.thevortex.potionsmaster.init.ModRegistry;
 import com.thevortex.potionsmaster.network.PacketHandler;
@@ -13,19 +10,12 @@ import com.thevortex.potionsmaster.reference.Reference;
 import com.thevortex.potionsmaster.render.util.BlockStore;
 import com.thevortex.potionsmaster.render.util.BlockStoreBuilder;
 import com.thevortex.potionsmaster.render.util.xray.Controller;
-import net.minecraft.core.Holder;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.alchemy.Potion;
-import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.alchemy.Potions;
-import net.minecraft.world.item.crafting.Ingredient;
 import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModContainer;
@@ -35,7 +25,8 @@ import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.brewing.RegisterBrewingRecipesEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent.PlayerLoggedOutEvent;
-
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 
 @SuppressWarnings("deprecation")
@@ -69,11 +60,11 @@ public class PotionsMaster {
 		}
 	}
 
-	public static ResourceLocation getId(String pathIn) {
-		return ResourceLocation.fromNamespaceAndPath(MOD_ID, pathIn);
+	public static Identifier getId(String pathIn) {
+		return Identifier.fromNamespaceAndPath(MOD_ID, pathIn);
 	}
 
-	@EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD, modid = MOD_ID)
+	@EventBusSubscriber(modid = MOD_ID)
 	public static class setupMod {
 		@SubscribeEvent
 		public static void setup(final FMLCommonSetupEvent event) {
@@ -86,16 +77,16 @@ public class PotionsMaster {
 
 			for (String name : ModRegistry.EffectsListParsed.keySet()) {
 				// Get the actual calcinated powder item
-				Item calcinatedPowder = BuiltInRegistries.ITEM.get(
-						ResourceLocation.fromNamespaceAndPath(MOD_ID, "calcinated_" + name + "_oresight_powder")
+				Item calcinatedPowder = BuiltInRegistries.ITEM.getValue(
+						Identifier.fromNamespaceAndPath(MOD_ID, "calcinated_" + name + "_oresight_powder")
 				);
 
 				// Register the brewing recipe using the calcinated powder item directly
 				if (calcinatedPowder != Items.AIR) {
-					event.getBuilder().addRecipe(
-							Ingredient.of(getPotion(Potions.MUNDANE)),
-							Ingredient.of(calcinatedPowder),
-							PotionContents.createItemStack(Items.POTION, ModRegistry.PotionsListParsed.get(name))
+					event.getBuilder().addMix(
+							Potions.MUNDANE,
+							calcinatedPowder,
+							ModRegistry.PotionsListParsed.get(name)
 					);
 					PotionsMaster.LOGGER.info("Registered brewing recipe for: " + name);
 				}
@@ -103,17 +94,11 @@ public class PotionsMaster {
 
 			PotionsMaster.LOGGER.info("=== Brewing Recipes Registration Complete ===");
 		}
-
-		private static ItemStack getPotion(Holder<Potion> potion) {
-			ItemStack itemstack = Items.POTION.getDefaultInstance();
-			itemstack.set(DataComponents.POTION_CONTENTS, new PotionContents(potion));
-			return itemstack;
-		}
 	}
 
-	@EventBusSubscriber(bus = EventBusSubscriber.Bus.GAME, value = Dist.CLIENT, modid = MOD_ID)
+	@EventBusSubscriber(value = Dist.CLIENT, modid = MOD_ID)
 	public static class PlayerEvents {
-		@OnlyIn(Dist.CLIENT)
+		
 		@SubscribeEvent
 		public static void onPlayerLogOut(PlayerLoggedOutEvent event) {
 			if (Controller.drawOres()) {

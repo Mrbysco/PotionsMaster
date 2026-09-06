@@ -6,7 +6,7 @@ import com.thevortex.potionsmaster.reference.Reference;
 import com.thevortex.potionsmaster.render.util.BlockData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.DynamicTexture;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,7 +19,7 @@ import java.util.Map;
  */
 public class EffectTextureFileGenerator {
 
-    private static final Map<String, ResourceLocation> registeredTextures = new HashMap<>();
+    private static final Map<String, Identifier> registeredTextures = new HashMap<>();
     private static NativeImage cachedBaseTexture = null;
 
     /**
@@ -57,12 +57,12 @@ public class EffectTextureFileGenerator {
             NativeImage coloredTexture = applyColorTint(baseTexture, color);
 
             // Create DynamicTexture from the NativeImage
-            DynamicTexture dynamicTexture = new DynamicTexture(coloredTexture);
+            DynamicTexture dynamicTexture = new DynamicTexture(() -> "effect", coloredTexture);
 
             // Register to texture manager with the location Minecraft expects for mob effects
             // Minecraft looks for mob effect textures in the mob_effects atlas
             // But we register them directly to the texture manager
-            ResourceLocation textureLocation = ResourceLocation.fromNamespaceAndPath(
+            Identifier textureLocation = Identifier.fromNamespaceAndPath(
                 Reference.MOD_ID,
                 "textures/mob_effect/" + effectName + ".png"
             );
@@ -88,7 +88,7 @@ public class EffectTextureFileGenerator {
         }
 
         try {
-            ResourceLocation baseLocation = ResourceLocation.fromNamespaceAndPath(
+            Identifier baseLocation = Identifier.fromNamespaceAndPath(
                 Reference.MOD_ID,
                 "textures/mob_effect/basepotioneffect.png"
             );
@@ -128,7 +128,7 @@ public class EffectTextureFileGenerator {
         // Apply tint to each pixel
         for (int y = 0; y < base.getHeight(); y++) {
             for (int x = 0; x < base.getWidth(); x++) {
-                int pixel = base.getPixelRGBA(x, y);
+                int pixel = base.getPixel(x, y);
 
                 // Extract RGBA components
                 int origR = pixel & 0xFF;
@@ -143,7 +143,7 @@ public class EffectTextureFileGenerator {
 
                 // Set pixel in RGBA format
                 int newPixel = (a << 24) | (newB << 16) | (newG << 8) | newR;
-                tinted.setPixelRGBA(x, y, newPixel);
+                tinted.setPixel(x, y, newPixel);
             }
         }
 
@@ -153,7 +153,7 @@ public class EffectTextureFileGenerator {
     /**
      * Gets the registered texture location for an effect
      */
-    public static ResourceLocation getEffectTextureLocation(String effectName) {
+    public static Identifier getEffectTextureLocation(String effectName) {
         return registeredTextures.get(effectName);
     }
 

@@ -1,6 +1,5 @@
 package com.thevortex.potionsmaster.events;
 
-import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.thevortex.potionsmaster.PotionsMaster;
 import com.thevortex.potionsmaster.items.potions.effect.oresight.OreSightEffect;
@@ -11,7 +10,7 @@ import com.thevortex.potionsmaster.render.util.BlockData;
 
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.player.Player;
@@ -24,7 +23,7 @@ import net.neoforged.neoforge.event.entity.living.MobEffectEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.server.ServerStartedEvent;
 
-@EventBusSubscriber(bus = EventBusSubscriber.Bus.GAME)
+@EventBusSubscriber
 @SuppressWarnings({"StringBuilderReplaceableByString", "NullableProblems"})
 public class PotionExpiry {
     @SubscribeEvent
@@ -61,7 +60,7 @@ public class PotionExpiry {
                     if (blastingJson != null) {
                         // Validate the JSON can be parsed
                         JsonParser.parseString(blastingJson).getAsJsonObject();
-                        ResourceLocation recipeId = ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, oreName + "_blasting");
+                        Identifier recipeId = Identifier.fromNamespaceAndPath(Reference.MOD_ID, oreName + "_blasting");
 
                         // Log successful registration
                         PotionsMaster.LOGGER.debug("  Registered blasting recipe: " + recipeId);
@@ -78,7 +77,7 @@ public class PotionExpiry {
                     if (craftingJson != null) {
                         // Validate the JSON can be parsed
                         JsonParser.parseString(craftingJson).getAsJsonObject();
-                        ResourceLocation recipeId = ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, oreName + "_crafting");
+                        Identifier recipeId = Identifier.fromNamespaceAndPath(Reference.MOD_ID, oreName + "_crafting");
 
                         // Log successful registration
                         PotionsMaster.LOGGER.debug("  Registered crafting recipe: " + recipeId);
@@ -100,11 +99,11 @@ public class PotionExpiry {
         String basePowderName = oreName + "_oresight_powder";
         String calcinatedPowderName = "calcinated_" + oreName + "_oresight_powder";
 
-        Item basePowder = BuiltInRegistries.ITEM.get(
-                ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, basePowderName)
+        Item basePowder = BuiltInRegistries.ITEM.getValue(
+                Identifier.fromNamespaceAndPath(Reference.MOD_ID, basePowderName)
         );
-        Item calcinatedPowder = BuiltInRegistries.ITEM.get(
-                ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, calcinatedPowderName)
+        Item calcinatedPowder = BuiltInRegistries.ITEM.getValue(
+                Identifier.fromNamespaceAndPath(Reference.MOD_ID, calcinatedPowderName)
         );
 
         if (basePowder == Items.AIR || calcinatedPowder == Items.AIR) {
@@ -144,8 +143,8 @@ public class PotionExpiry {
 
         // Verify items exist
         String basePowderName = oreName + "_oresight_powder";
-        Item basePowder = BuiltInRegistries.ITEM.get(
-                ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, basePowderName)
+        Item basePowder = BuiltInRegistries.ITEM.getValue(
+                Identifier.fromNamespaceAndPath(Reference.MOD_ID, basePowderName)
         );
 
         if (basePowder == Items.AIR) {
@@ -160,21 +159,11 @@ public class PotionExpiry {
         json.append("  \"category\": \"misc\",\n");
         json.append("  \"group\": \"potionsmaster:ore_powder\",\n");
         json.append("  \"ingredients\": [\n");
-        json.append("    {\n");
-        json.append("      \"item\": \"").append(Reference.MOD_ID).append(":pestle\"\n");
-        json.append("    },\n");
-        json.append("    {\n");
-        json.append("      \"item\": \"").append(Reference.MOD_ID).append(":tile_mortar\"\n");
-        json.append("    },\n");
-        json.append("    {\n");
-        json.append("      \"item\": \"minecraft:glowstone\"\n");
-        json.append("    },\n");
-        json.append("    {\n");
-        json.append("      \"item\": \"").append(Reference.MOD_ID).append(":ender_powder\"\n");
-        json.append("    },\n");
-        json.append("    {\n");
-        json.append("      \"tag\": \"").append(oreTag).append("\"\n");
-        json.append("    }\n");
+        json.append("    \"").append(Reference.MOD_ID).append(":pestle\",\n");
+        json.append("    \"").append(Reference.MOD_ID).append(":tile_mortar\",\n");
+        json.append("    \"minecraft:glowstone\",\n");
+        json.append("    \"").append(Reference.MOD_ID).append(":ender_powder\",\n");
+        json.append("    \"#").append(oreTag).append("\"\n");
         json.append("  ],\n");
         json.append("  \"result\": {\n");
         json.append("    \"id\": \"").append(Reference.MOD_ID).append(":").append(oreName).append("_oresight_powder\",\n");
@@ -229,7 +218,7 @@ public class PotionExpiry {
 
 
     private static boolean isOreSightPotion(Holder<MobEffect> potion) {
-        return potion.getKey().location().getNamespace().contains("potionsmaster");
+        return potion.getKey().identifier().getNamespace().contains("potionsmaster");
     }
 
 }

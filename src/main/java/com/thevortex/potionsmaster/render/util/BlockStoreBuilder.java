@@ -1,38 +1,19 @@
 package com.thevortex.potionsmaster.render.util;
 
-import java.io.BufferedReader;
+import com.google.gson.Gson;
+import com.thevortex.potionsmaster.PotionsMaster;
+import net.neoforged.fml.loading.FMLPaths;
+
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
-import java.io.StringReader;
-import java.nio.charset.StandardCharsets;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
-import java.nio.file.*;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.google.gson.reflect.TypeToken;
-import java.lang.reflect.Type;
-
-import com.google.gson.stream.JsonReader;
-import com.thevortex.potionsmaster.PotionsMaster;
-import com.thevortex.potionsmaster.init.ModRegistry;
-import com.thevortex.potionsmaster.items.potions.effect.oresight.OreSightEffect;
-import com.thevortex.potionsmaster.items.powders.base.BasePowder;
-import com.thevortex.potionsmaster.items.powders.base.CalcinatedPowder;
-import com.thevortex.potionsmaster.reference.Ores;
-
-import net.minecraft.client.Minecraft;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.world.effect.MobEffectCategory;
-import net.minecraft.world.item.Item;
-import net.neoforged.fml.loading.FMLPaths;
-import net.neoforged.neoforge.registries.NeoForgeRegistries;
-
-import javax.annotation.Nullable;
 
 
 public class BlockStoreBuilder {

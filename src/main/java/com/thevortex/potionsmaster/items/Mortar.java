@@ -1,10 +1,11 @@
 package com.thevortex.potionsmaster.items;
 
 
-import com.thevortex.potionsmaster.init.ModRegistry;
 import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemInstance;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.level.block.Block;
+import org.jspecify.annotations.Nullable;
 
 public class Mortar extends BlockItem {
 
@@ -13,14 +14,8 @@ public class Mortar extends BlockItem {
     }
 
     @Override
-    public boolean hasCraftingRemainingItem(ItemStack stack) {
-        return (stack.getItem() == ModRegistry.ITEM_MORTAR.get());
-    }
-
-    @Override
-    public ItemStack getCraftingRemainingItem(ItemStack itemStack) {
-
-        return new ItemStack(this);
+    public @Nullable ItemStackTemplate getCraftingRemainder(ItemInstance instance) {
+        return new ItemStackTemplate(this);
     }
 
 }

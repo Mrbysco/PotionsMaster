@@ -13,10 +13,8 @@ public class Mortar extends Block {
 
     public VoxelShape blockshape = Block.box(3.0D, 0.0D, 3.0D, 13.0D, 5.0D, 13.0D);
 
-
-    public Mortar() {
-
-        super(Properties.of().sound(SoundType.STONE).strength(2.0f));
+    public Mortar(Properties properties) {
+        super(properties.sound(SoundType.STONE).strength(2.0f));
     }
 
     @Override

@@ -7,10 +7,8 @@ import com.thevortex.potionsmaster.reference.Reference;
 import com.thevortex.potionsmaster.render.util.BlockData;
 import net.minecraft.client.renderer.texture.SpriteContents;
 import net.minecraft.client.renderer.texture.atlas.SpriteSource;
-import net.minecraft.client.renderer.texture.atlas.SpriteSourceType;
 import net.minecraft.client.resources.metadata.animation.FrameSize;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.resources.ResourceMetadata;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 
@@ -24,7 +22,6 @@ import java.util.Optional;
 public class DynamicEffectSpriteSource implements SpriteSource {
 
     public static final MapCodec<DynamicEffectSpriteSource> CODEC = MapCodec.unit(DynamicEffectSpriteSource::new);
-    public static final SpriteSourceType TYPE = new SpriteSourceType(CODEC);
 
     // Keep baseTexture alive across the entire sprite source lifecycle
     private static NativeImage baseTexture = null;
@@ -33,8 +30,8 @@ public class DynamicEffectSpriteSource implements SpriteSource {
      * Register this sprite source type with the given event
      */
     @SuppressWarnings("deprecation")
-    public static void registerSpriteSourceType(net.neoforged.neoforge.client.event.RegisterSpriteSourceTypesEvent event) {
-        event.register(ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, "dynamic_effect"), CODEC);
+    public static void registerSpriteSourceType(net.neoforged.neoforge.client.event.RegisterSpriteSourcesEvent event) {
+        event.register(Identifier.fromNamespaceAndPath(Reference.MOD_ID, "dynamic_effect"), CODEC);
     }
 
     @Override
@@ -51,21 +48,20 @@ public class DynamicEffectSpriteSource implements SpriteSource {
         // Generate sprite for each effect
         for (BlockData data : PotionsMaster.blockStore.getStore().values()) {
             String effectName = data.getEntryName() + "_sight";
-            ResourceLocation spriteLocation = ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, effectName);
+            Identifier spriteLocation = Identifier.fromNamespaceAndPath(Reference.MOD_ID, "mob_effect/" + effectName);
 
             try {
                 // Generate colored texture
                 final NativeImage coloredTexture = applyColorTint(baseTexture, data.getColor());
-                final ResourceLocation finalSpriteLocation = spriteLocation;
+                final Identifier finalSpriteLocation = spriteLocation;
 
                 // Create sprite contents and register with output
-                // Output.add() accepts ResourceLocation and SpriteSource.SpriteSupplier
+                // Output.add() accepts Identifier and SpriteSource.SpriteSupplier
                 // SpriteSupplier is Function<SpriteResourceLoader, SpriteContents>
                 output.add(spriteLocation, (spriteResourceLoader) -> new SpriteContents(
                     finalSpriteLocation,
                     new FrameSize(coloredTexture.getWidth(), coloredTexture.getHeight()),
-                    coloredTexture,
-                    ResourceMetadata.EMPTY
+                    coloredTexture
                 ));
 
                 PotionsMaster.LOGGER.info("Generated dynamic sprite for effect: " + effectName + " with color 0x" + Integer.toHexString(data.getColor()));
@@ -80,9 +76,9 @@ public class DynamicEffectSpriteSource implements SpriteSource {
 
     private NativeImage loadBaseTexture(ResourceManager resourceManager) {
         try {
-            ResourceLocation baseLocation = ResourceLocation.fromNamespaceAndPath(
+            Identifier baseLocation = Identifier.fromNamespaceAndPath(
                 Reference.MOD_ID,
-                "textures/mob_effect/basepotioneffect.png"
+                "mob_effect/basepotioneffect.png"
             );
 
             Optional<Resource> resource = resourceManager.getResource(baseLocation);
@@ -110,7 +106,7 @@ public class DynamicEffectSpriteSource implements SpriteSource {
         // Apply tint to each pixel
         for (int y = 0; y < base.getHeight(); y++) {
             for (int x = 0; x < base.getWidth(); x++) {
-                int pixel = base.getPixelRGBA(x, y);
+                int pixel = base.getPixel(x, y);
 
                 // Extract RGBA components
                 int origR = pixel & 0xFF;
@@ -125,7 +121,7 @@ public class DynamicEffectSpriteSource implements SpriteSource {
 
                 // Set pixel in RGBA format
                 int newPixel = (a << 24) | (newB << 16) | (newG << 8) | newR;
-                tinted.setPixelRGBA(x, y, newPixel);
+                tinted.setPixel(x, y, newPixel);
             }
         }
 
@@ -133,8 +129,8 @@ public class DynamicEffectSpriteSource implements SpriteSource {
     }
 
     @Override
-    public SpriteSourceType type() {
-        return TYPE;
+    public MapCodec<? extends SpriteSource> codec() {
+        return CODEC;
     }
 }
 

@@ -1,19 +1,19 @@
 package com.thevortex.potionsmaster.events;
 
 import com.thevortex.potionsmaster.PotionsMaster;
-import com.thevortex.potionsmaster.reference.Reference;
 import com.thevortex.potionsmaster.datapack.DynamicRecipeProvider;
+import com.thevortex.potionsmaster.reference.Reference;
 import com.thevortex.potionsmaster.render.util.BlockData;
 import net.minecraft.server.packs.PackLocationInfo;
 import net.minecraft.server.packs.PackResources;
-import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.PackSelectionConfig;
+import net.minecraft.server.packs.PackType;
+import net.minecraft.server.packs.repository.Pack;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.minecraft.server.packs.PackType;
 import net.neoforged.neoforge.event.AddPackFindersEvent;
 
-@EventBusSubscriber(modid = Reference.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid = Reference.MOD_ID)
 @SuppressWarnings({"NullableProblems"})
 public class ServerEvents {
 

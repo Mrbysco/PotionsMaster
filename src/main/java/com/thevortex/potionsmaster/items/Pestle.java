@@ -1,8 +1,9 @@
 package com.thevortex.potionsmaster.items;
 
-import com.thevortex.potionsmaster.init.ModRegistry;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemInstance;
+import net.minecraft.world.item.ItemStackTemplate;
+import org.jspecify.annotations.Nullable;
 
 
 public class Pestle extends Item {
@@ -14,14 +15,8 @@ public class Pestle extends Item {
     }
 
     @Override
-    public boolean hasCraftingRemainingItem(ItemStack stack) {
-        return (stack.getItem() == ModRegistry.PESTLE.get());
-    }
-
-    @Override
-    public ItemStack getCraftingRemainingItem(ItemStack itemStack) {
-
-        return new ItemStack(this);
+    public @Nullable ItemStackTemplate getCraftingRemainder(ItemInstance instance) {
+        return new ItemStackTemplate(this);
     }
 
 

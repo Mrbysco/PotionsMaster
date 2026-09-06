@@ -1,0 +1,9 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "potionsmaster:item/calcinated_base",
+    "tints": [
+      { "type": "potionsmaster:oresight_powder" }
+    ]
+  }
+}

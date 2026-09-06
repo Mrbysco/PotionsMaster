@@ -6,12 +6,8 @@
     " W "
   ],
   "key": {
-    "W": {
-      "tag": "c:bricks"
-    },
-    "o": {
-      "item": "minecraft:stone"
-    }
+    "W": "#c:bricks",
+    "o": "minecraft:stone"
   },
   "result": {
     "id": "potionsmaster:tile_mortar"

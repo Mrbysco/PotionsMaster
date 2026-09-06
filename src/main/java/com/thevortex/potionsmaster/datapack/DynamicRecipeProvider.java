@@ -3,17 +3,23 @@ package com.thevortex.potionsmaster.datapack;
 import com.thevortex.potionsmaster.PotionsMaster;
 import com.thevortex.potionsmaster.reference.Reference;
 import com.thevortex.potionsmaster.render.util.BlockData;
+import net.minecraft.DetectedVersion;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.PackLocationInfo;
 import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.PackType;
-import net.minecraft.server.packs.metadata.MetadataSectionSerializer;
+import net.minecraft.server.packs.metadata.MetadataSectionType;
+import net.minecraft.server.packs.metadata.pack.PackMetadataSection;
 import net.minecraft.server.packs.resources.IoSupplier;
+import net.minecraft.util.InclusiveRange;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
+import org.jspecify.annotations.Nullable;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Set;
@@ -48,7 +54,7 @@ public class DynamicRecipeProvider implements PackResources {
     }
 
     @Override
-    public IoSupplier<InputStream> getResource(PackType packType, ResourceLocation location) {
+    public IoSupplier<InputStream> getResource(PackType packType, Identifier location) {
         PotionsMaster.LOGGER.debug("getResource called: " + packType + " -> " + location);
 
         // Only handle server/data resources for recipes
@@ -121,11 +127,11 @@ public class DynamicRecipeProvider implements PackResources {
         String basePowderName = oreName + "_oresight_powder";
         String calcinatedPowderName = "calcinated_" + oreName + "_oresight_powder";
 
-        Item basePowder = BuiltInRegistries.ITEM.get(
-                ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, basePowderName)
+        Item basePowder = BuiltInRegistries.ITEM.getValue(
+                Identifier.fromNamespaceAndPath(Reference.MOD_ID, basePowderName)
         );
-        Item calcinatedPowder = BuiltInRegistries.ITEM.get(
-                ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, calcinatedPowderName)
+        Item calcinatedPowder = BuiltInRegistries.ITEM.getValue(
+                Identifier.fromNamespaceAndPath(Reference.MOD_ID, calcinatedPowderName)
         );
 
         if (basePowder == Items.AIR) {
@@ -143,9 +149,7 @@ public class DynamicRecipeProvider implements PackResources {
         StringBuilder json = new StringBuilder();
         json.append("{\n");
         json.append("  \"type\": \"minecraft:blasting\",\n");
-        json.append("  \"ingredient\": {\n");
-        json.append("    \"item\": \"").append(Reference.MOD_ID).append(":").append(oreName).append("_oresight_powder\"\n");
-        json.append("  },\n");
+        json.append("  \"ingredient\": \"").append(Reference.MOD_ID).append(":").append(oreName).append("_oresight_powder\",\n");
         json.append("  \"result\": {\n");
         json.append("    \"id\": \"").append(Reference.MOD_ID).append(":calcinated_").append(oreName).append("_oresight_powder\",\n");
         json.append("    \"count\": 1\n");
@@ -181,8 +185,8 @@ public class DynamicRecipeProvider implements PackResources {
 
         // Verify items exist
         String basePowderName = oreName + "_oresight_powder";
-        Item basePowder = BuiltInRegistries.ITEM.get(
-                ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, basePowderName)
+        Item basePowder = BuiltInRegistries.ITEM.getValue(
+                Identifier.fromNamespaceAndPath(Reference.MOD_ID, basePowderName)
         );
 
         if (basePowder == Items.AIR) {
@@ -202,21 +206,11 @@ public class DynamicRecipeProvider implements PackResources {
         json.append("  \"category\": \"misc\",\n");
         json.append("  \"group\": \"potionsmaster:ore_powder\",\n");
         json.append("  \"ingredients\": [\n");
-        json.append("    {\n");
-        json.append("      \"item\": \"").append(Reference.MOD_ID).append(":pestle\"\n");
-        json.append("    },\n");
-        json.append("    {\n");
-        json.append("      \"item\": \"").append(Reference.MOD_ID).append(":tile_mortar\"\n");
-        json.append("    },\n");
-        json.append("    {\n");
-        json.append("      \"item\": \"minecraft:glowstone\"\n");
-        json.append("    },\n");
-        json.append("    {\n");
-        json.append("      \"item\": \"").append(Reference.MOD_ID).append(":ender_powder\"\n");
-        json.append("    },\n");
-        json.append("    {\n");
-        json.append("      \"item\": \"").append(blockData.getrecipeItem()).append("\"\n");
-        json.append("    }\n");
+        json.append("    \"").append(Reference.MOD_ID).append(":pestle\",\n");
+        json.append("    \"").append(Reference.MOD_ID).append(":tile_mortar\",\n");
+        json.append("    \"minecraft:glowstone\",\n");
+        json.append("    \"").append(Reference.MOD_ID).append(":ender_powder\",\n");
+        json.append("    \"").append(blockData.getrecipeItem()).append("\"\n");
         json.append("  ],\n");
         json.append("  \"result\": {\n");
         json.append("    \"id\": \"").append(Reference.MOD_ID).append(":").append(oreName).append("_oresight_powder\",\n");
@@ -258,7 +252,7 @@ public class DynamicRecipeProvider implements PackResources {
             PotionsMaster.LOGGER.info("  Listing recipe for: " + oreName);
 
             // List blasting recipe
-            ResourceLocation blastingLoc = ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, "recipe/" + oreName + "_blasting.json");
+            Identifier blastingLoc = Identifier.fromNamespaceAndPath(Reference.MOD_ID, "recipe/" + oreName + "_blasting.json");
             resourceOutput.accept(blastingLoc, () -> {
                 PotionsMaster.LOGGER.debug("getResource called for: " + blastingLoc);
                 String jsonContent = generateBlastingRecipeJson(oreName);
@@ -269,7 +263,7 @@ public class DynamicRecipeProvider implements PackResources {
             });
 
             // List crafting recipe
-            ResourceLocation craftingLoc = ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, "recipe/" + oreName + "_crafting.json");
+            Identifier craftingLoc = Identifier.fromNamespaceAndPath(Reference.MOD_ID, "recipe/" + oreName + "_crafting.json");
             resourceOutput.accept(craftingLoc, () -> {
                 PotionsMaster.LOGGER.debug("getResource called for: " + craftingLoc);
                 String jsonContent = generateCraftingRecipeJson(oreName);
@@ -287,17 +281,11 @@ public class DynamicRecipeProvider implements PackResources {
     }
 
     @Override
-    public <T> T getMetadataSection(MetadataSectionSerializer<T> deserializer) {
-        if (deserializer.getMetadataSectionName().equals("pack")) {
-            com.google.gson.JsonObject packMeta = new com.google.gson.JsonObject();
-            packMeta.addProperty("pack_format", net.minecraft.SharedConstants.getCurrentVersion().getPackVersion(PackType.SERVER_DATA));
-            packMeta.addProperty("description", "PotionsMaster Dynamic Recipes");
-
-            try {
-                return deserializer.fromJson(packMeta);
-            } catch (Exception e) {
-                PotionsMaster.LOGGER.error("Failed to create recipe pack metadata", e);
-            }
+    public @Nullable <T> T getMetadataSection(MetadataSectionType<T> metadataSerializer) throws IOException {
+        if (metadataSerializer.name().equals("pack")) {
+            return (T) new PackMetadataSection(
+                    Component.literal("PotionsMaster Dynamic Recipes"),
+                    new InclusiveRange<>(DetectedVersion.BUILT_IN.packVersion(PackType.SERVER_DATA)));
         }
         return null;
     }
