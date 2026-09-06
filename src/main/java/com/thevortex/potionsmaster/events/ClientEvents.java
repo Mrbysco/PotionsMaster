@@ -1,6 +1,7 @@
 package com.thevortex.potionsmaster.events;
 
 import com.thevortex.potionsmaster.PotionsMaster;
+import com.thevortex.potionsmaster.client.DynamicEffectSpriteSource;
 import com.thevortex.potionsmaster.reference.Reference;
 import com.thevortex.potionsmaster.render.util.BlockData;
 import com.thevortex.potionsmaster.tint.OresightPowderTintSource;
@@ -10,8 +11,11 @@ import net.minecraft.resources.Identifier;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.event.AddClientReloadListenersEvent;
 import net.neoforged.neoforge.client.event.ModelEvent;
 import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
+import net.neoforged.neoforge.client.event.RegisterSpriteSourcesEvent;
+import net.neoforged.neoforge.client.event.TextureAtlasStitchedEvent;
 import net.neoforged.neoforge.client.model.standalone.SimpleUnbakedStandaloneModel;
 import net.neoforged.neoforge.client.model.standalone.StandaloneModelKey;
 
@@ -40,7 +44,7 @@ public class ClientEvents {
     private static void registerModel(ModelEvent.RegisterStandalone event,
                                       StandaloneModelKey<QuadCollection> key, String path) {
         event.register(key, SimpleUnbakedStandaloneModel.quadCollection(
-                Identifier.fromNamespaceAndPath(Reference.MOD_ID, path)));
+                PotionsMaster.getId(path)));
     }
 
     private static StandaloneModelKey<QuadCollection> makeKey(String name) {
@@ -57,22 +61,22 @@ public class ClientEvents {
     }
 
     @SubscribeEvent
-    public static void onRegisterSprites(net.neoforged.neoforge.client.event.RegisterSpriteSourcesEvent event) {
+    public static void onRegisterSprites(RegisterSpriteSourcesEvent event) {
         PotionsMaster.LOGGER.info("=== Registering Sprite Source Types ===");
         // Register our custom sprite source type for dynamic effect icons
-        com.thevortex.potionsmaster.client.DynamicEffectSpriteSource.registerSpriteSourceType(event);
+        event.register(PotionsMaster.getId("dynamic_effect"), DynamicEffectSpriteSource.CODEC);
         PotionsMaster.LOGGER.info("=== Sprite Source Types Registration Complete ===");
     }
 
     @SubscribeEvent
-    public static void onRegisterClientReloadListeners(net.neoforged.neoforge.client.event.AddClientReloadListenersEvent event) {
+    public static void onRegisterClientReloadListeners(AddClientReloadListenersEvent event) {
         PotionsMaster.LOGGER.info("=== Registering Language Reload Listener ===");
-        event.addListener(Identifier.fromNamespaceAndPath(Reference.MOD_ID, "dynamic_language"), new com.thevortex.potionsmaster.client.DynamicLanguageProvider());
+        event.addListener(PotionsMaster.getId("dynamic_language"), new com.thevortex.potionsmaster.client.DynamicLanguageProvider());
         PotionsMaster.LOGGER.info("=== Language Reload Listener Registered ===");
     }
 
     @SubscribeEvent
-    public static void onTextureAtlasStitch(net.neoforged.neoforge.client.event.TextureAtlasStitchedEvent event) {
+    public static void onTextureAtlasStitch(TextureAtlasStitchedEvent event) {
         // After mob_effect atlas is stitched, verify our sprites were added
         if (event.getAtlas().location().equals(Identifier.withDefaultNamespace("textures/atlas/mob_effects.png"))) {
             PotionsMaster.LOGGER.info("Mob effects atlas stitched - dynamic effect icons should be available");
@@ -118,11 +122,11 @@ public class ClientEvents {
 
             for(BlockData data : PotionsMaster.blockStore.getStore().values()) {
                 // Register regular powder model using base_powder as template;
-                itemModels.put(Identifier.fromNamespaceAndPath(Reference.MOD_ID, data.getEntryName() + "_oresight_powder"), basePowderModel);
+                itemModels.put(PotionsMaster.getId(data.getEntryName() + "_oresight_powder"), basePowderModel);
                 PotionsMaster.LOGGER.info("Registered model for " + data.getEntryName() + "_oresight_powder");
 
                 // Register calcinated powder model using calcinated_base as template
-                itemModels.put(Identifier.fromNamespaceAndPath(Reference.MOD_ID, "calcinated_" + data.getEntryName() + "_oresight_powder"), calcinatedBaseModel);
+                itemModels.put(PotionsMaster.getId("calcinated_" + data.getEntryName() + "_oresight_powder"), calcinatedBaseModel);
                 PotionsMaster.LOGGER.info("Registered model for calcinated_" + data.getEntryName() + "_oresight_powder");
             }
 

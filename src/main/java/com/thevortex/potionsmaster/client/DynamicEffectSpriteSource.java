@@ -19,20 +19,12 @@ import java.util.Optional;
  * Custom sprite source that generates dynamic mob effect icon sprites at runtime
  * This works the same way as the powder model generation - dynamically creating assets
  */
-public class DynamicEffectSpriteSource implements SpriteSource {
+public record DynamicEffectSpriteSource() implements SpriteSource {
 
     public static final MapCodec<DynamicEffectSpriteSource> CODEC = MapCodec.unit(DynamicEffectSpriteSource::new);
 
     // Keep baseTexture alive across the entire sprite source lifecycle
     private static NativeImage baseTexture = null;
-
-    /**
-     * Register this sprite source type with the given event
-     */
-    @SuppressWarnings("deprecation")
-    public static void registerSpriteSourceType(net.neoforged.neoforge.client.event.RegisterSpriteSourcesEvent event) {
-        event.register(Identifier.fromNamespaceAndPath(Reference.MOD_ID, "dynamic_effect"), CODEC);
-    }
 
     @Override
     public void run(ResourceManager resourceManager, Output output) {
@@ -48,7 +40,7 @@ public class DynamicEffectSpriteSource implements SpriteSource {
         // Generate sprite for each effect
         for (BlockData data : PotionsMaster.blockStore.getStore().values()) {
             String effectName = data.getEntryName() + "_sight";
-            Identifier spriteLocation = Identifier.fromNamespaceAndPath(Reference.MOD_ID, "mob_effect/" + effectName);
+            Identifier spriteLocation = PotionsMaster.getId("mob_effect/" + effectName);
 
             try {
                 // Generate colored texture
@@ -78,7 +70,7 @@ public class DynamicEffectSpriteSource implements SpriteSource {
         try {
             Identifier baseLocation = Identifier.fromNamespaceAndPath(
                 Reference.MOD_ID,
-                "mob_effect/basepotioneffect.png"
+                "textures/mob_effect/basepotioneffect.png"
             );
 
             Optional<Resource> resource = resourceManager.getResource(baseLocation);

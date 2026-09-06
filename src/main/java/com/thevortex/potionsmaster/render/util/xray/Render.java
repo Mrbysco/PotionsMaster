@@ -3,13 +3,12 @@ package com.thevortex.potionsmaster.render.util.xray;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.thevortex.potionsmaster.reference.Reference;
+import com.thevortex.potionsmaster.PotionsMaster;
 import com.thevortex.potionsmaster.render.util.BlockInfo;
 import com.thevortex.potionsmaster.render.util.Util;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.rendertype.RenderSetup;
 import net.minecraft.client.renderer.rendertype.RenderType;
-import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.Shapes;
@@ -61,7 +60,7 @@ public class Render {
 
     private static final RenderPipeline XRAY_PIPELINE = RenderPipeline
             .builder(RenderPipelines.LINES_SNIPPET)
-            .withLocation(Identifier.fromNamespaceAndPath(Reference.MOD_ID, "xray_lines"))
+            .withLocation(PotionsMaster.getId("xray_lines"))
             .withDepthStencilState(Optional.empty())
             .build();
 

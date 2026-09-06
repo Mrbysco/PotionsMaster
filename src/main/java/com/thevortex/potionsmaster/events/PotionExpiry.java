@@ -60,7 +60,7 @@ public class PotionExpiry {
                     if (blastingJson != null) {
                         // Validate the JSON can be parsed
                         JsonParser.parseString(blastingJson).getAsJsonObject();
-                        Identifier recipeId = Identifier.fromNamespaceAndPath(Reference.MOD_ID, oreName + "_blasting");
+                        Identifier recipeId = PotionsMaster.getId(oreName + "_blasting");
 
                         // Log successful registration
                         PotionsMaster.LOGGER.debug("  Registered blasting recipe: " + recipeId);
@@ -77,7 +77,7 @@ public class PotionExpiry {
                     if (craftingJson != null) {
                         // Validate the JSON can be parsed
                         JsonParser.parseString(craftingJson).getAsJsonObject();
-                        Identifier recipeId = Identifier.fromNamespaceAndPath(Reference.MOD_ID, oreName + "_crafting");
+                        Identifier recipeId = PotionsMaster.getId(oreName + "_crafting");
 
                         // Log successful registration
                         PotionsMaster.LOGGER.debug("  Registered crafting recipe: " + recipeId);
@@ -100,10 +100,10 @@ public class PotionExpiry {
         String calcinatedPowderName = "calcinated_" + oreName + "_oresight_powder";
 
         Item basePowder = BuiltInRegistries.ITEM.getValue(
-                Identifier.fromNamespaceAndPath(Reference.MOD_ID, basePowderName)
+                PotionsMaster.getId(basePowderName)
         );
         Item calcinatedPowder = BuiltInRegistries.ITEM.getValue(
-                Identifier.fromNamespaceAndPath(Reference.MOD_ID, calcinatedPowderName)
+                PotionsMaster.getId(calcinatedPowderName)
         );
 
         if (basePowder == Items.AIR || calcinatedPowder == Items.AIR) {
@@ -144,7 +144,7 @@ public class PotionExpiry {
         // Verify items exist
         String basePowderName = oreName + "_oresight_powder";
         Item basePowder = BuiltInRegistries.ITEM.getValue(
-                Identifier.fromNamespaceAndPath(Reference.MOD_ID, basePowderName)
+                PotionsMaster.getId(basePowderName)
         );
 
         if (basePowder == Items.AIR) {

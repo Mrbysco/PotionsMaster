@@ -128,10 +128,10 @@ public class DynamicRecipeProvider implements PackResources {
         String calcinatedPowderName = "calcinated_" + oreName + "_oresight_powder";
 
         Item basePowder = BuiltInRegistries.ITEM.getValue(
-                Identifier.fromNamespaceAndPath(Reference.MOD_ID, basePowderName)
+                PotionsMaster.getId(basePowderName)
         );
         Item calcinatedPowder = BuiltInRegistries.ITEM.getValue(
-                Identifier.fromNamespaceAndPath(Reference.MOD_ID, calcinatedPowderName)
+                PotionsMaster.getId(calcinatedPowderName)
         );
 
         if (basePowder == Items.AIR) {
@@ -186,7 +186,7 @@ public class DynamicRecipeProvider implements PackResources {
         // Verify items exist
         String basePowderName = oreName + "_oresight_powder";
         Item basePowder = BuiltInRegistries.ITEM.getValue(
-                Identifier.fromNamespaceAndPath(Reference.MOD_ID, basePowderName)
+                PotionsMaster.getId(basePowderName)
         );
 
         if (basePowder == Items.AIR) {
@@ -252,7 +252,7 @@ public class DynamicRecipeProvider implements PackResources {
             PotionsMaster.LOGGER.info("  Listing recipe for: " + oreName);
 
             // List blasting recipe
-            Identifier blastingLoc = Identifier.fromNamespaceAndPath(Reference.MOD_ID, "recipe/" + oreName + "_blasting.json");
+            Identifier blastingLoc = PotionsMaster.getId("recipe/" + oreName + "_blasting.json");
             resourceOutput.accept(blastingLoc, () -> {
                 PotionsMaster.LOGGER.debug("getResource called for: " + blastingLoc);
                 String jsonContent = generateBlastingRecipeJson(oreName);
@@ -263,7 +263,7 @@ public class DynamicRecipeProvider implements PackResources {
             });
 
             // List crafting recipe
-            Identifier craftingLoc = Identifier.fromNamespaceAndPath(Reference.MOD_ID, "recipe/" + oreName + "_crafting.json");
+            Identifier craftingLoc = PotionsMaster.getId("recipe/" + oreName + "_crafting.json");
             resourceOutput.accept(craftingLoc, () -> {
                 PotionsMaster.LOGGER.debug("getResource called for: " + craftingLoc);
                 String jsonContent = generateCraftingRecipeJson(oreName);

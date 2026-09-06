@@ -1,6 +1,6 @@
 package com.thevortex.potionsmaster.init;
 
-import com.thevortex.potionsmaster.reference.Reference;
+import com.thevortex.potionsmaster.PotionsMaster;
 
 import net.minecraft.resources.Identifier;
 
@@ -65,7 +65,7 @@ public class ModPotions {
 */
 
     private static Identifier location(String name) {
-        return Identifier.fromNamespaceAndPath(Reference.MOD_ID, name);
+        return PotionsMaster.getId(name);
     }
 
 }
