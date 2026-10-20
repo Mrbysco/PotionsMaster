@@ -37,12 +37,9 @@ public record OreSightEnablePacket(String effectType) implements CustomPacketPay
 			BlockStore.BlockDataWithUUID bdUUID = PotionsMaster.blockStore.getStoreByReference(effectType);
 			if (bdUUID == null) return;
 
-			BlockData oreSight = bdUUID.getBlockData();
-			if (!oreSight.isDrawing()) {
-				oreSight.setDrawing(true);
-				if (!Controller.drawOres()) {
-					Controller.toggleDrawOres();
-				}
+			bdUUID.getBlockData().setDrawing(true);
+			if (!Controller.drawOres()) {
+				Controller.toggleDrawOres();
 			}
 		}
 	}

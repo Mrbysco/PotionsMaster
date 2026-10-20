@@ -41,7 +41,7 @@ public record PotionPacket(String potionName) implements CustomPacketPayload {
             BlockStore store = PotionsMaster.blockStore;
             store.getStoreByReference(potion).getBlockData().setDrawing(false);
             if(store.getStore().values().stream().noneMatch(BlockData::isDrawing)) {
-                Controller.toggleDrawOres();
+                Controller.shutdownExecutor();
             }
         }
     }
