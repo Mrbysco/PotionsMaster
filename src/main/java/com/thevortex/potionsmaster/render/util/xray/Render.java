@@ -1,8 +1,9 @@
 package com.thevortex.potionsmaster.render.util.xray;
 
-import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.renderpearl.api.pipeline.ColorTargetState;
+import com.mojang.renderpearl.api.pipeline.RenderPipeline;
 import com.thevortex.potionsmaster.PotionsMaster;
 import com.thevortex.potionsmaster.render.util.BlockInfo;
 import com.thevortex.potionsmaster.render.util.Util;
@@ -61,6 +62,7 @@ public class Render {
     public static final RenderPipeline XRAY_PIPELINE = RenderPipeline
             .builder(RenderPipelines.LINES_SNIPPET)
             .withLocation(PotionsMaster.getId("xray_lines"))
+            .withColorTargetState(ColorTargetState.DEFAULT)
             .withDepthStencilState(Optional.empty())
             .build();
 

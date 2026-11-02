@@ -2,6 +2,7 @@ package com.thevortex.potionsmaster.events;
 
 import com.google.gson.JsonParser;
 import com.thevortex.potionsmaster.PotionsMaster;
+import com.thevortex.potionsmaster.init.ModRegistry;
 import com.thevortex.potionsmaster.items.potions.effect.oresight.OreSightEffect;
 import com.thevortex.potionsmaster.network.PacketHandler;
 import com.thevortex.potionsmaster.network.PotionPacket;
@@ -87,7 +88,28 @@ public class PotionExpiry {
                     PotionsMaster.LOGGER.error("Failed to register crafting recipe for: " + oreName, e);
                     failureCount++;
                 }
+
             }
+
+            for (String name : ModRegistry.EffectsListParsed.keySet()) {
+                // Try to register brewing recipe
+                try {
+                    String brewingJson = generateBrewingRecipeJson(name);
+                    if (brewingJson != null) {
+                        // Validate the JSON can be parsed
+                        JsonParser.parseString(brewingJson).getAsJsonObject();
+                        Identifier recipeId = PotionsMaster.getId(name + "_brewing");
+
+                        // Log successful registration
+                        PotionsMaster.LOGGER.debug("  Registered brewing recipe: " + recipeId);
+                        successCount++;
+                    }
+                } catch (Exception e) {
+                    PotionsMaster.LOGGER.error("Failed to register brewing recipe for: " + name, e);
+                    failureCount++;
+                }
+            }
+
             PotionsMaster.LOGGER.info("=== Recipe registration complete: " + successCount + " registered, " + failureCount + " failed ===");
         } catch (Exception e) {
             PotionsMaster.LOGGER.error("Failed to register recipes", e);
@@ -174,6 +196,35 @@ public class PotionExpiry {
         return json.toString();
     }
 
+    private static String generateBrewingRecipeJson(String oreName) {
+        String powder = PotionsMaster.getId("calcinated_" + oreName + "_oresight_powder").toString();
+        String potion = ModRegistry.PotionsListParsed.get(oreName).getId().toString();
+
+        StringBuilder json = new StringBuilder();
+        json.append("{\n");
+        json.append("  \"type\": \"minecraft:brewing\",\n");
+        json.append("  \"input\": {\n");
+        json.append("    \"item\": \"minecraft:potion\",\n");
+        json.append("    \"potion_contents\": {\n");
+        json.append("      \"potions\": \"minecraft:mundane\"\n");
+        json.append("    }\n");
+        json.append("  },\n");
+        json.append("  \"output\": {\n");
+        json.append("    \"components\": {\n");
+        json.append("      \"minecraft:potion_contents\": {\n");
+        json.append("        \"potion\": \"").append(potion).append("\"\n");
+        json.append("      }\n");
+        json.append("    },\n");
+        json.append("    \"id\": \"minecraft:potion\"\n");
+        json.append("  },\n");
+        json.append("  \"reagent\": {\n");
+        json.append("    \"item\": \"").append(powder).append("\"\n");
+        json.append("  }\n");
+        json.append("}\n");
+
+        return json.toString();
+    }
+
     @SubscribeEvent
     public static void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
         if(event.getEntity() instanceof Player player) {
@@ -218,7 +269,7 @@ public class PotionExpiry {
 
 
     private static boolean isOreSightPotion(Holder<MobEffect> potion) {
-        return potion.getKey().identifier().getNamespace().contains("potionsmaster");
+        return potion.key().identifier().getNamespace().contains("potionsmaster");
     }
 
 }

@@ -10,11 +10,7 @@ import com.thevortex.potionsmaster.reference.Reference;
 import com.thevortex.potionsmaster.render.util.BlockStore;
 import com.thevortex.potionsmaster.render.util.BlockStoreBuilder;
 import com.thevortex.potionsmaster.render.util.xray.Controller;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.alchemy.Potions;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -23,7 +19,6 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.brewing.RegisterBrewingRecipesEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent.PlayerLoggedOutEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -52,7 +47,7 @@ public class PotionsMaster {
 		eventBus.register(setupMod.class);
 		eventBus.addListener(PacketHandler::register);
 		NeoForge.EVENT_BUS.register(PotionExpiry.class);
-		NeoForge.EVENT_BUS.addListener(setupMod::registerPotions);
+//		NeoForge.EVENT_BUS.addListener(setupMod::registerPotions);
 		if (dist.isClient()) {
 			PotionsMaster.proxy = new ClientProxy();
 		} else {
@@ -69,30 +64,6 @@ public class PotionsMaster {
 		@SubscribeEvent
 		public static void setup(final FMLCommonSetupEvent event) {
 			proxy.init();
-		}
-
-
-		public static void registerPotions(RegisterBrewingRecipesEvent event) {
-			PotionsMaster.LOGGER.info("=== Registering Brewing Recipes ===");
-
-			for (String name : ModRegistry.EffectsListParsed.keySet()) {
-				// Get the actual calcinated powder item
-				Item calcinatedPowder = BuiltInRegistries.ITEM.getValue(
-						Identifier.fromNamespaceAndPath(MOD_ID, "calcinated_" + name + "_oresight_powder")
-				);
-
-				// Register the brewing recipe using the calcinated powder item directly
-				if (calcinatedPowder != Items.AIR) {
-					event.getBuilder().addMix(
-							Potions.MUNDANE,
-							calcinatedPowder,
-							ModRegistry.PotionsListParsed.get(name)
-					);
-					PotionsMaster.LOGGER.info("Registered brewing recipe for: " + name);
-				}
-			}
-
-			PotionsMaster.LOGGER.info("=== Brewing Recipes Registration Complete ===");
 		}
 	}
 

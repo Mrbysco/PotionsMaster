@@ -1,6 +1,7 @@
 package com.thevortex.potionsmaster.datapack;
 
 import com.thevortex.potionsmaster.PotionsMaster;
+import com.thevortex.potionsmaster.init.ModRegistry;
 import com.thevortex.potionsmaster.reference.Reference;
 import com.thevortex.potionsmaster.render.util.BlockData;
 import net.minecraft.DetectedVersion;
@@ -92,6 +93,28 @@ public class DynamicRecipeProvider implements PackResources {
             String recipeName = recipePath.substring(0, recipePath.length() - "_crafting".length());
             PotionsMaster.LOGGER.info("Generating crafting recipe for: " + recipeName);
             jsonContent = generateCraftingRecipeJson(recipeName);
+        } else if (recipePath.endsWith("_splash_brewing")) {
+            String recipeName = recipePath.substring(0, recipePath.length() - "_splash_brewing".length());
+            PotionsMaster.LOGGER.info("Generating splash brewing recipe for: " + recipeName);
+            jsonContent = generateBrewingRecipeJson(recipeName, "minecraft:splash_potion");
+        } else if (recipePath.endsWith("_lingering_brewing")) {
+            String recipeName = recipePath.substring(0, recipePath.length() - "_lingering_brewing".length());
+            PotionsMaster.LOGGER.info("Generating lingering brewing recipe for: " + recipeName);
+            jsonContent = generateBrewingRecipeJson(recipeName, "minecraft:lingering_potion");
+        } else if (recipePath.endsWith("_brewing")) {
+            String recipeName = recipePath.substring(0, recipePath.length() - "_brewing".length());
+            PotionsMaster.LOGGER.info("Generating brewing recipe for: " + recipeName);
+            jsonContent = generateBrewingRecipeJson(recipeName, "minecraft:potion");
+        } else if (recipePath.endsWith("_splash_convert")) {
+            String recipeName = recipePath.substring(0, recipePath.length() - "_splash_conversion".length());
+            PotionsMaster.LOGGER.info("Generating brewing splash conversion recipe for: " + recipeName);
+            jsonContent = generateConversionRecipeJson(recipeName,
+                    "minecraft:potion", "minecraft:gunpowder", "minecraft:splash_potion");
+        } else if (recipePath.endsWith("_lingering_convert")) {
+            String recipeName = recipePath.substring(0, recipePath.length() - "_lingering_conversion".length());
+            PotionsMaster.LOGGER.info("Generating brewing lingering conversion recipe for: " + recipeName);
+            jsonContent = generateConversionRecipeJson(recipeName,
+                    "minecraft:splash_potion", "minecraft:dragon_breath", "minecraft:lingering_potion");
         }
 
         if (jsonContent != null) {
@@ -222,6 +245,83 @@ public class DynamicRecipeProvider implements PackResources {
         return json.toString();
     }
 
+    /**
+     * Generate JSON content for a brewing recipe
+     */
+    private String generateBrewingRecipeJson(String name, String container) {
+        Item calcinatedPowder = BuiltInRegistries.ITEM.getValue(
+                PotionsMaster.getId("calcinated_" + name + "_oresight_powder"));
+        var potionEntry = ModRegistry.PotionsListParsed.get(name);
+
+        if (calcinatedPowder == Items.AIR || potionEntry == null) {
+            PotionsMaster.LOGGER.warn("  [Brewing] Missing powder or potion for: " + name);
+            return null;
+        }
+
+        String powder = PotionsMaster.getId("calcinated_" + name + "_oresight_powder").toString();
+        String potion = potionEntry.getId().toString();
+
+        StringBuilder json = new StringBuilder();
+        json.append("{\n");
+        json.append("  \"type\": \"minecraft:brewing\",\n");
+        json.append("  \"input\": {\n");
+        json.append("    \"item\": \"").append(container).append("\",\n");
+        json.append("    \"potion_contents\": {\n");
+        json.append("      \"potions\": \"minecraft:mundane\"\n");
+        json.append("    }\n");
+        json.append("  },\n");
+        json.append("  \"output\": {\n");
+        json.append("    \"components\": {\n");
+        json.append("      \"minecraft:potion_contents\": {\n");
+        json.append("        \"potion\": \"").append(potion).append("\"\n");
+        json.append("      }\n");
+        json.append("    },\n");
+        json.append("    \"id\": \"").append(container).append("\"\n");
+        json.append("  },\n");
+        json.append("  \"reagent\": {\n");
+        json.append("    \"item\": \"").append(powder).append("\"\n");
+        json.append("  }\n");
+        json.append("}\n");
+
+        return json.toString();
+    }
+
+    /**
+     * Generate JSON for a container conversion (potion -> splash -> lingering)
+     */
+    private String generateConversionRecipeJson(String name, String inputItem, String reagent, String outputItem) {
+        var potionEntry = ModRegistry.PotionsListParsed.get(name);
+        if (potionEntry == null) {
+            PotionsMaster.LOGGER.warn("  [Convert] Missing potion for: " + name);
+            return null;
+        }
+        String potion = potionEntry.getId().toString();
+
+        StringBuilder json = new StringBuilder();
+        json.append("{\n");
+        json.append("  \"type\": \"minecraft:brewing\",\n");
+        json.append("  \"input\": {\n");
+        json.append("    \"item\": \"").append(inputItem).append("\",\n");
+        json.append("    \"potion_contents\": {\n");
+        json.append("      \"potions\": \"").append(potion).append("\"\n");
+        json.append("    }\n");
+        json.append("  },\n");
+        json.append("  \"output\": {\n");
+        json.append("    \"components\": {\n");
+        json.append("      \"minecraft:potion_contents\": {\n");
+        json.append("        \"potion\": \"").append(potion).append("\"\n");
+        json.append("      }\n");
+        json.append("    },\n");
+        json.append("    \"id\": \"").append(outputItem).append("\"\n");
+        json.append("  },\n");
+        json.append("  \"reagent\": {\n");
+        json.append("    \"item\": \"").append(reagent).append("\"\n");
+        json.append("  }\n");
+        json.append("}\n");
+
+        return json.toString();
+    }
+
     @Override
     public void listResources(PackType packType, String namespace, String path, ResourceOutput resourceOutput) {
         PotionsMaster.LOGGER.info("listResources called: packType=" + packType + ", namespace=" + namespace + ", path='" + path + "'");
@@ -272,6 +372,36 @@ public class DynamicRecipeProvider implements PackResources {
                 }
                 return new ByteArrayInputStream(new byte[0]);
             });
+        }
+
+        String[][] brewingVariants = {
+                {"_brewing", "minecraft:potion"},
+                {"_splash_brewing", "minecraft:splash_potion"},
+                {"_lingering_brewing", "minecraft:lingering_potion"}
+        };
+        String[][] conversions = {
+                {"_splash_convert", "minecraft:potion", "minecraft:gunpowder", "minecraft:splash_potion"},
+                {"_lingering_convert", "minecraft:splash_potion", "minecraft:dragon_breath", "minecraft:lingering_potion"}
+        };
+
+        for (String name : ModRegistry.EffectsListParsed.keySet()) {
+            for (String[] variant : brewingVariants) {
+                String jsonContent = generateBrewingRecipeJson(name, variant[1]);
+                if (jsonContent != null) {
+                    byte[] bytes = jsonContent.getBytes(StandardCharsets.UTF_8);
+                    resourceOutput.accept(PotionsMaster.getId("recipe/" + name + variant[0] + ".json"),
+                            () -> new ByteArrayInputStream(bytes));
+                }
+            }
+
+            for (String[] convert : conversions) {
+                String jsonContent = generateConversionRecipeJson(name, convert[1], convert[2], convert[3]);
+                if (jsonContent != null) {
+                    byte[] bytes = jsonContent.getBytes(StandardCharsets.UTF_8);
+                    resourceOutput.accept(PotionsMaster.getId("recipe/" + name + convert[0] + ".json"),
+                            () -> new ByteArrayInputStream(bytes));
+                }
+            }
         }
     }
 
