@@ -58,7 +58,7 @@ public class Render {
 
     public static final Render INSTANCE = new Render();
 
-    private static final RenderPipeline XRAY_PIPELINE = RenderPipeline
+    public static final RenderPipeline XRAY_PIPELINE = RenderPipeline
             .builder(RenderPipelines.LINES_SNIPPET)
             .withLocation(PotionsMaster.getId("xray_lines"))
             .withDepthStencilState(Optional.empty())
