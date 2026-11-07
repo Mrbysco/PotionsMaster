@@ -73,7 +73,7 @@ public class BlockStoreBuilder {
             list.add(new BlockData("diamond", "c:ores/diamond", 0xFF3DDBE3, false, 0,"minecraft:diamond"));
             list.add(new BlockData("iron", "c:ores/iron", 0xFFE4C0AA, false, 0,"minecraft:raw_iron"));
             list.add(new BlockData("gold", "c:ores/gold", 0xFFD4AF37, false, 0,"minecraft:raw_gold"));
-            list.add(new BlockData("netherite", "c:ores/ancient_debris", 0xFFFFA500, false, 0,"minecraft:netherite_scrap"));
+            list.add(new BlockData("netherite", "c:ores/netherite_scrap", 0xFFFFA500, false, 0,"minecraft:netherite_scrap"));
             list.add(new BlockData("quartz", "c:ores/nether_quartz", 0xFFFFFFFF, false, 0,"minecraft:quartz"));
             list.add(new BlockData("copper", "c:ores/copper", 0xFFB7703A, false, 0,"minecraft:raw_copper"));
         }
